@@ -1,1 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emmy Henz VCF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.12);
+            --glass-shine: rgba(255,255,255,0.08);
+            --bg: #050914;
+            --text: #f0f4ff;
+            --muted: rgba(200,210,255,0.5);
+            --rose: #f472b6;
+            --cyan: #22d3ee;
+            --violet: #a78bfa;
+            --gold: #fbbf24;
+        }
 
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Aurora background */
+        .aurora {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .aurora::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -10%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(ellipse, rgba(167,139,250,0.18) 0%, transparent 70%);
+            animation: drift1 12s ease-in-out infinite alternate;
+        }
+        .aurora::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -10%;
+            width: 65%;
+            height: 65%;
+            background: radial-gradient(ellipse, rgba(244,114,182,0.15) 0%, transparent 70%);
+            animation: drift2 14s ease-in-out infinite alternate;
+        }
+        .aurora-mid {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(ellipse, rgba(34,211,238,0.1) 0%, transparent 70%);
+            animation: drift3 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(5%,8%) scale(1.1); } }
+        @keyframes drift2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-6%,-5%) scale(1.08); } }
+        @keyframes drift3 { from { transform: translateX(-50%) scale(1); } to { transform: translateX(-45%) scale(1.15); } }
+
+        /* Floating particles */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            opacity: 0;
+            animation: float-up linear infinite;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        /* Main card */
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+            background: var(--glass);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 52px 44px;
+            text-align: center;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.04) inset,
+                0 40px 80px rgba(0,0,0,0.6),
+                0 0 60px rgba(167,139,250,0.06);
+            animation: card-in 0.8s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        /* Shine strip at top of card */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 10%; right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            border-radius: 100%;
+        }
+
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Logo / crown */
+        .logo-ring {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(244,114,182,0.2));
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 1.8rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(167,139,250,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: spin-hue 8s linear infinite;
+        }
+        @keyframes spin-hue {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, #fff 20%, var(--rose) 60%, var(--violet) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 500;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+
+        .description {
+            color: var(--muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 36px;
+            font-weight: 300;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.3), rgba(244,114,182,0.3));
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50px;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(167,139,250,0.15);
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(167,139,250,0.5), rgba(244,114,182,0.5));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .cta-btn:hover::before { opacity: 1; }
+        .cta-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(167,139,250,0.3);
+            border-color: rgba(255,255,255,0.25);
+        }
+        .cta-btn span { position: relative; z-index: 1; }
+        .cta-btn .arrow { font-size: 1.1rem; position: relative; z-index: 1; transition: transform 0.3s; }
+        .cta-btn:hover .arrow { transform: translateX(4px); }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 36px 0 28px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--glass-border);
+        }
+        .divider span {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            white-space: nowrap;
+        }
+
+        /* Community links */
+        .community { text-align: left; }
+        .community-title {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .community-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .community-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            text-decoration: none;
+            color: var(--text);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .community-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(37,211,102,0.08), rgba(37,211,102,0.02));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .community-link:hover::before { opacity: 1; }
+        .community-link:hover {
+            border-color: rgba(37,211,102,0.3);
+            transform: translateX(4px);
+            box-shadow: 0 4px 20px rgba(37,211,102,0.1);
+        }
+        .wa-icon {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(37,211,102,0.3);
+        }
+        .link-info { flex: 1; }
+        .link-label {
+            font-size: 0.82rem;
+            color: rgba(37,211,102,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        .link-name {
+            font-size: 0.93rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .link-arrow {
+            color: var(--muted);
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+        .community-link:hover .link-arrow { transform: translateX(3px); color: #25d366; }
+
+        /* Footer */
+        .footer {
+            position: relative;
+            z-index: 1;
+            margin-top: 24px;
+            font-size: 0.78rem;
+            color: rgba(200,210,255,0.25);
+            letter-spacing: 0.05em;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            body { padding: 16px; overflow-y: auto; }
+            .card { padding: 40px 24px; border-radius: 24px; }
+            h1 { font-size: 1.8rem; }
+            .description { font-size: 0.88rem; margin-bottom: 28px; }
+            .cta-btn { padding: 14px 28px; font-size: 0.95rem; }
+            .community-link { padding: 12px 14px; }
+            .link-name { font-size: 0.85rem; }
+            .wa-icon { width: 34px; height: 34px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Aurora background -->
+    <div class="aurora"><div class="aurora-mid"></div></div>
+
+    <!-- Floating particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="card">
+        <div class="logo-ring">💎</div>
+        <h1>Emmy Henz VCF</h1>
+        <p class="tagline">Contact Collection Suite</p>
+        <p class="description">
+            Create a beautiful time-locked session to gather contacts from your circle. 
+            Your VCF file unlocks only when the countdown hits zero.
+        </p>
+        <a href="/create.html" class="cta-btn">
+            <span>Create New Session</span>
+            <span class="arrow">→</span>
+        </a>
+
+        <div class="divider"><span>Join the community</span></div>
+
+        <div class="community">
+            <p class="community-title">Stay connected with Emmy Henz</p>
+            <div class="community-links">
+                <a href="https://whatsapp.com/channel/0029Vb9AcCa0rGiD0eJYsQ1n" target="_blank" rel="noopener" class="community-link">
+                    <div class="wa-icon">📢</div>
+                    <div class="link-info">
+                        <div class="link-label">WhatsApp Channel</div>
+                        <div class="link-name">Emmy Henz Official Channel</div>
+                    </div>
+                    <span class="link-arrow">›</span>
+                </a>
+                <a href="https://chat.whatsapp.com/GQih5FXDZOp8BF1kHuw8Ac?mode=gi_t" target="_blank" rel="noopener" class="community-link">
+                    <div class="wa-icon">👥</div>
+                    <div class="link-info">
+                        <div class="link-label">WhatsApp Group</div>
+                        <div class="link-name">Emmy Henz Community Group</div>
+                    </div>
+                    <span class="link-arrow">›</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <p class="footer">Emmy Henz VCF &nbsp;·&nbsp; All rights reserved</p>
+
+    <script>
+        // Generate particles
+        const container = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            p.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${Math.random() * 100}%;
+                animation-duration: ${Math.random() * 15 + 10}s;
+                animation-delay: ${Math.random() * 10}s;
+                opacity: 0;
+            `;
+            container.appendChild(p);
+        }
+    </script>
+</body>
+</html>
