@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -489,4 +490,497 @@
         initSession();
     </script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session — Emmy Henz VCF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.1);
+            --bg: #050914;
+            --text: #f0f4ff;
+            --muted: rgba(200,210,255,0.5);
+            --input-bg: rgba(255,255,255,0.04);
+            --input-border: rgba(255,255,255,0.08);
+            --violet: #a78bfa;
+            --rose: #f472b6;
+            --cyan: #22d3ee;
+            --green: #10b981;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .aurora {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .aurora::before {
+            content: '';
+            position: absolute;
+            top: -20%; left: -10%; width: 65%; height: 65%;
+            background: radial-gradient(ellipse, rgba(167,139,250,0.14) 0%, transparent 70%);
+            animation: d1 12s ease-in-out infinite alternate;
+        }
+        .aurora::after {
+            content: '';
+            position: absolute;
+            bottom: -20%; right: -10%; width: 60%; height: 60%;
+            background: radial-gradient(ellipse, rgba(244,114,182,0.1) 0%, transparent 70%);
+            animation: d2 14s ease-in-out infinite alternate;
+        }
+        @keyframes d1 { to { transform: translate(5%,8%) scale(1.1); } }
+        @keyframes d2 { to { transform: translate(-4%,-6%) scale(1.08); } }
+
+        .card {
+            position: relative; z-index: 1;
+            width: 100%; max-width: 520px;
+            background: var(--glass);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 44px 40px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset;
+            animation: card-in 0.7s cubic-bezier(0.16,1,0.3,1) both;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 12%; right: 12%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        }
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(24px) scale(0.98); }
+            to { opacity: 1; transform: none; }
+        }
+
+        /* Header */
+        .header { text-align: center; margin-bottom: 28px; }
+        #sessionName {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; font-weight: 900;
+            background: linear-gradient(135deg, #fff 20%, var(--rose) 60%, var(--violet));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 6px;
+        }
+        .header p { color: var(--muted); font-size: 0.88rem; font-weight: 300; }
+
+        /* Timer */
+        .timer-card {
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(167,139,250,0.2);
+            border-radius: 18px;
+            padding: 24px 20px;
+            text-align: center;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .timer-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 20%; right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(167,139,250,0.5), transparent);
+        }
+        .timer-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--violet);
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+        #timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(167,139,250,0.5), 0 0 40px rgba(167,139,250,0.25);
+            letter-spacing: 3px;
+            line-height: 1;
+        }
+        .timer-units {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-top: 8px;
+        }
+        .timer-unit-label {
+            font-size: 0.65rem;
+            color: rgba(200,210,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            width: 3.8ch;
+            text-align: center;
+        }
+        /* Adjust spacing for the colons */
+        .timer-unit-label:not(:last-child) { margin-right: 1.2ch; }
+
+        #timerMessage {
+            margin-top: 12px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            font-weight: 300;
+        }
+
+        /* Progress bar */
+        .progress-track {
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 100px;
+            margin-top: 16px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--violet), var(--rose));
+            border-radius: 100px;
+            width: 100%;
+            transform-origin: left;
+            transition: width 1s linear;
+        }
+
+        /* Form */
+        .form-group { margin-bottom: 18px; }
+        label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 7px;
+        }
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute;
+            left: 14px; top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem; opacity: 0.35;
+            pointer-events: none;
+        }
+        input {
+            width: 100%;
+            padding: 13px 14px 13px 40px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            border-color: rgba(167,139,250,0.45);
+            background: rgba(167,139,250,0.05);
+            box-shadow: 0 0 0 3px rgba(167,139,250,0.1);
+        }
+        input::placeholder { color: rgba(200,210,255,0.18); }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.35), rgba(5,150,105,0.45));
+            border: 1px solid rgba(16,185,129,0.3);
+            border-radius: 13px;
+            color: #fff;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+            position: relative; overflow: hidden;
+            letter-spacing: 0.03em;
+            box-shadow: 0 4px 16px rgba(16,185,129,0.1);
+        }
+        .submit-btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(16,185,129,0.55), rgba(5,150,105,0.65));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .submit-btn:hover::before { opacity: 1; }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(16,185,129,0.25); }
+        .submit-btn span { position: relative; z-index: 1; }
+
+        #statusMessage {
+            margin-top: 12px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            text-align: center;
+            display: none;
+        }
+
+        /* Download section */
+        #downloadSection { margin-top: 24px; display: none; }
+
+        .unlock-banner {
+            text-align: center;
+            padding: 20px;
+            background: rgba(16,185,129,0.06);
+            border: 1px solid rgba(16,185,129,0.2);
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+        .unlock-banner .unlock-icon { font-size: 2rem; margin-bottom: 8px; }
+        .unlock-banner h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--green);
+            margin-bottom: 4px;
+        }
+        .unlock-banner p { color: var(--muted); font-size: 0.85rem; }
+
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.35), rgba(109,40,217,0.45));
+            border: 1px solid rgba(139,92,246,0.35);
+            border-radius: 13px;
+            color: #fff;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 600;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+            box-shadow: 0 4px 20px rgba(139,92,246,0.15);
+            animation: pulse-glow 2.5s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(139,92,246,0.15); }
+            50% { box-shadow: 0 4px 32px rgba(139,92,246,0.4); }
+        }
+        .download-btn:hover {
+            transform: scale(1.02) translateY(-2px);
+            background: linear-gradient(135deg, rgba(139,92,246,0.55), rgba(109,40,217,0.65));
+            box-shadow: 0 10px 36px rgba(139,92,246,0.4);
+        }
+
+        /* Not found state */
+        #notFound { display: none; text-align: center; }
+        #notFound .nf-icon { font-size: 3rem; margin-bottom: 16px; }
+        #notFound h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; color: var(--rose);
+            margin-bottom: 8px;
+        }
+        #notFound p { color: var(--muted); font-size: 0.9rem; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 480px) {
+            body { padding: 16px; }
+            .card { padding: 36px 20px; border-radius: 24px; }
+            #sessionName { font-size: 1.7rem; }
+            #timer { font-size: 8.5vw; letter-spacing: 1px; }
+            .timer-units { margin-top: 4px; }
+            .timer-unit-label { font-size: 0.55rem; width: 4.2ch; }
+            .timer-unit-label:not(:last-child) { margin-right: 1.4ch; }
+            .submit-btn { padding: 13px; font-size: 0.95rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="aurora"></div>
+
+    <div class="card">
+        <!-- Not found state -->
+        <div id="notFound">
+            <div class="nf-icon">🔍</div>
+            <h3>Session Not Found</h3>
+            <p>This session doesn't exist or may have been removed.</p>
+        </div>
+
+        <!-- Session content -->
+        <div id="sessionContent">
+            <div class="header">
+                <h2 id="sessionName">Loading…</h2>
+                <p id="instructionsText">Drop your contact details below!</p>
+            </div>
+
+            <div class="timer-card" id="timerContainer">
+                <div class="timer-label">⏳ VCF File Unlocks In</div>
+                <div id="timer">--:--:--:--</div>
+                <div class="timer-units">
+                    <span class="timer-unit-label">days</span>
+                    <span class="timer-unit-label">hrs</span>
+                    <span class="timer-unit-label">min</span>
+                    <span class="timer-unit-label">sec</span>
+                </div>
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+                <div id="timerMessage">Awaiting countdown…</div>
+            </div>
+
+            <form id="contactForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="name" required placeholder="Your full name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">📞</span>
+                        <input type="tel" id="phone" required pattern="^\+.*" placeholder="+234 800 000 0000">
+                    </div>
+                </div>
+                <button type="submit" class="submit-btn"><span>Submit My Contact ✦</span></button>
+                <div id="statusMessage"></div>
+            </form>
+
+            <div id="downloadSection">
+                <div class="unlock-banner">
+                    <div class="unlock-icon">🔓</div>
+                    <h3>Contacts Unlocked!</h3>
+                    <p>The timer has expired. Your VCF file is ready to download.</p>
+                </div>
+                <a href="#" id="downloadBtn" class="download-btn">
+                    <span>⬇</span>
+                    <span>Download All Contacts (.vcf)</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pathParts = window.location.pathname.split('/');
+        const sessionId = pathParts[pathParts.length - 1];
+
+        let unlockTime = 0;
+        let totalDuration = 0;
+        let timerInterval;
+        let redirectLink = '';
+
+        async function initSession() {
+            try {
+                const res = await fetch(`/api/sessions/${sessionId}`);
+                if (!res.ok) {
+                    document.getElementById('sessionContent').style.display = 'none';
+                    document.getElementById('notFound').style.display = 'block';
+                    return;
+                }
+
+                const session = await res.json();
+                document.getElementById('sessionName').textContent = session.name;
+                document.title = `${session.name} — Emmy Henz VCF`;
+                unlockTime = session.unlockTime;
+                redirectLink = session.link || '';
+
+                // estimate total duration (can't know exactly, but approximate from unlockTime vs now)
+                totalDuration = unlockTime - Date.now();
+
+                document.getElementById('downloadBtn').href = `/api/export-vcf/${sessionId}`;
+
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function updateTimer() {
+            const now = Date.now();
+            const remaining = unlockTime - now;
+
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer').textContent = '00:00:00:00';
+                document.getElementById('timer').style.textShadow = '0 0 20px rgba(16,185,129,0.6), 0 0 40px rgba(16,185,129,0.3)';
+                document.getElementById('timerMessage').textContent = 'Timer complete — contacts locked in!';
+                document.getElementById('timerMessage').style.color = 'var(--green)';
+                document.getElementById('progressFill').style.width = '0%';
+                document.getElementById('contactForm').style.display = 'none';
+                document.getElementById('instructionsText').style.display = 'none';
+                document.getElementById('downloadSection').style.display = 'block';
+                return;
+            }
+
+            const d = Math.floor(remaining / 86400000);
+            const h = Math.floor((remaining % 86400000) / 3600000);
+            const m = Math.floor((remaining % 3600000) / 60000);
+            const s = Math.floor((remaining % 60000) / 1000);
+
+            document.getElementById('timer').textContent =
+                `${String(d).padStart(2,'0')}:${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+            // Progress bar (shrinks as time passes)
+            if (totalDuration > 0) {
+                const pct = (remaining / totalDuration) * 100;
+                document.getElementById('progressFill').style.width = Math.max(0, pct) + '%';
+            }
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const statusDiv = document.getElementById('statusMessage');
+
+            try {
+                const res = await fetch(`/api/contacts/${sessionId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone })
+                });
+
+                statusDiv.style.display = 'block';
+
+                if (res.ok) {
+                    statusDiv.style.background = 'rgba(16,185,129,0.08)';
+                    statusDiv.style.border = '1px solid rgba(16,185,129,0.2)';
+                    statusDiv.style.color = '#6ee7b7';
+                    statusDiv.textContent = redirectLink ? '✓ Contact saved! Redirecting you…' : '✓ Contact saved successfully!';
+                    e.target.reset();
+
+                    if (redirectLink) {
+                        setTimeout(() => {
+                            window.location.href = redirectLink.startsWith('http') ? redirectLink : 'https://' + redirectLink;
+                        }, 1500);
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    statusDiv.style.background = 'rgba(239,68,68,0.08)';
+                    statusDiv.style.border = '1px solid rgba(239,68,68,0.2)';
+                    statusDiv.style.color = '#fca5a5';
+                    statusDiv.textContent = err.error || 'Something went wrong. Please try again.';
+                }
+            } catch {
+                statusDiv.style.display = 'block';
+                statusDiv.style.background = 'rgba(239,68,68,0.08)';
+                statusDiv.style.border = '1px solid rgba(239,68,68,0.2)';
+                statusDiv.style.color = '#fca5a5';
+                statusDiv.textContent = 'Network error. Please try again.';
+            }
+        });
+
+        initSession();
+    </script>
+</body>
+>>>>>>> 590143505ffb5449a601e9686a57224541f648b7
 </html>
